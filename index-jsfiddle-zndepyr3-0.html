@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solve Wedding Image Puzzle</title>
+
+  <style>
+    /* Thiết lập cho toàn trang */
+body {
+  background-color: #fff;
+  font-family: Arial, sans-serif;
+  color: #b8860b; /* Màu vàng gold */
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* Container của mini game */
+.container {
+  text-align: center;
+}
+
+/* Game board */
+#game-board {
+  width: 300px;
+  height: 300px;
+  border: 2px solid #b8860b;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 20px auto;
+  background-color: #fff;
+}
+
+/* Các mảnh ghép */
+.puzzle-piece {
+  width: 100px;
+  height: 100px;
+  box-sizing: border-box;
+  border: 1px solid #b8860b;
+  background-size: 300px 300px;
+  cursor: grab;
+}
+
+/* Thông báo */
+#message {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #b8860b;
+}
+
+  </style>
+
+  
+</head>
+<body>
+  <!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Game Ghép Hình Cưới</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>✨ Mini Game Ghép Hình Cưới ✨</h1>
+    <p>Kéo thả các mảnh ghép để hoàn thành bức ảnh cưới!</p>
+    <div id="game-board"></div>
+    <p id="message"></p>
+    <button onclick="createPuzzle()">🔄 Chơi lại</button>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+  <script>
+    const imageUrl = 'https://i.postimg.cc/fb1HPdmw/D1-F8-CC3-D-0-E36-43-E8-8-A35-2623-B36543-EC-1.jpg';
+let board; // Sẽ được khởi tạo sau khi DOM sẵn sàng
+let pieces = [];
+
+// Hàm xáo trộn mảng
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+// Hàm tạo puzzle
+function createPuzzle() {
+  board.innerHTML = ""; // Xóa các mảnh cũ nếu có
+  pieces = [];
+
+  // Tạo 9 mảnh ghép
+  for (let i = 0; i < 9; i++) {
+    let piece = document.createElement('div');
+    piece.classList.add('puzzle-piece');
+    piece.style.backgroundImage = `url(${imageUrl})`;
+    piece.style.backgroundPosition = `-${(i % 3) * 100}px -${Math.floor(i / 3) * 100}px`;
+    piece.draggable = true;
+    piece.dataset.index = i.toString();
+
+    // Xử lý kéo & thả
+    piece.addEventListener('dragstart', dragStart);
+    piece.addEventListener('dragover', dragOver);
+    piece.addEventListener('drop', drop);
+
+    pieces.push(piece);
+  }
+
+  shuffle(pieces);
+  pieces.forEach(piece => board.appendChild(piece));
+}
+
+// Lưu mảnh ghép khi bắt đầu kéo
+let draggedPiece = null;
+function dragStart(event) {
+  draggedPiece = event.target;
+}
+
+// Cho phép thả vào vị trí khác
+function dragOver(event) {
+  event.preventDefault();
+}
+
+// Xử lý hoán đổi vị trí 2 mảnh ghép
+function drop(event) {
+  event.preventDefault();
+  let targetPiece = event.target;
+  
+  if (targetPiece !== draggedPiece) {
+    // Hoán đổi vị trí background của 2 mảnh
+    let temp = draggedPiece.style.backgroundPosition;
+    draggedPiece.style.backgroundPosition = targetPiece.style.backgroundPosition;
+    targetPiece.style.backgroundPosition = temp;
+
+    // Hoán đổi chỉ số (index) của 2 mảnh
+    let tempIndex = draggedPiece.dataset.index;
+    draggedPiece.dataset.index = targetPiece.dataset.index;
+    targetPiece.dataset.index = tempIndex;
+  }
+
+  checkWin();
+}
+
+// Kiểm tra người chơi đã ghép đúng chưa
+function checkWin() {
+  let correct = true;
+  pieces.forEach(piece => {
+    const currentIndex = parseInt(piece.dataset.index);
+    const correctPosition = `-${(currentIndex % 3) * 100}px -${Math.floor(currentIndex / 3) * 100}px`;
+    if (piece.style.backgroundPosition !== correctPosition) {
+      correct = false;
+    }
+  });
+
+  if (correct) {
+    document.getElementById('message').textContent = "🎉 Chúc mừng! Bạn đã hoàn thành bức ảnh cưới! 🎉\nBạn đã nhận được voucher trị giá 1.000.000 VNĐ của thương hiệu TUAN VU BRIDAL.";
+  } else {
+    document.getElementById('message').textContent = "";
+  }
+}
+
+// Khởi động game sau khi DOM sẵn sàng
+document.addEventListener("DOMContentLoaded", function() {
+  board = document.getElementById('game-board');
+  createPuzzle();
+});
+
+  </script>
+</body>
+</html>
